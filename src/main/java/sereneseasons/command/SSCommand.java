@@ -8,22 +8,18 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.LoggingPrintStream;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.world.WorldServer;
 import org.apache.commons.lang3.ArrayUtils;
-import sereneseasons.api.config.SeasonsOption;
-import sereneseasons.api.config.SyncedConfig;
 import sereneseasons.api.season.Season;
 import sereneseasons.api.season.Season.SubSeason;
-import sereneseasons.config.SeasonsConfig;
 import sereneseasons.handler.season.SeasonHandler;
 import sereneseasons.season.SeasonSavedData;
 import sereneseasons.season.SeasonTime;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class SSCommand extends CommandBase
 {
@@ -81,15 +77,14 @@ public class SSCommand extends CommandBase
         final int ticksPerSecond = 20;
         int index = ArrayUtils.indexOf(SubSeason.VALUES, season);
 
-        if (index == 11)
-        {
-            index = -1;
-        }
-
         int ticksTillNext = subSeasonDuration * (index + 1) - seasonCycleTicks;
-        int days = ticksTillNext / ticksPerSecond / 60 / 60 / 24;
-        int hours = (ticksTillNext - (days * ticksPerSecond * 60 * 60 * 24)) / ticksPerSecond / 60 / 60;
-        sender.sendMessage(new TextComponentTranslation("commands.sereneseasons.getseason", season, days, hours));
+        int secondsLeft = ticksTillNext / ticksPerSecond;
+        long days = TimeUnit.SECONDS.toDays(secondsLeft);
+        long hours = TimeUnit.SECONDS.toHours(secondsLeft) - (days * 24);
+        long minutes = TimeUnit.SECONDS.toMinutes(secondsLeft) - (TimeUnit.SECONDS.toHours(secondsLeft)* 60);
+        long seconds = TimeUnit.SECONDS.toSeconds(secondsLeft) - (TimeUnit.SECONDS.toMinutes(secondsLeft) * 60);
+
+        sender.sendMessage(new TextComponentTranslation("commands.sereneseasons.getseason", season, days, hours, minutes, seconds));
     }
 
     private void setSeason(ICommandSender sender, String[] args) throws CommandException

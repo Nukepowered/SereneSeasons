@@ -25,10 +25,8 @@ configFile.withReader {
 }
 
 group = "com.github.glitchfiend.biomesoplenty"
-version = "${config.minecraft_version}-${config.mod_version}.${System.getenv().BUILD_NUMBER}"
+version = "${config.minecraft_version}-${config.mod_version}"
 archivesBaseName = "SereneSeasons"
-
-config.build_number = (System.getenv().BUILD_NUMBER) ? System.getenv().BUILD_NUMBER : ""
 
 minecraft {
     version = config.minecraft_version + "-" + config.forge_version
@@ -37,10 +35,8 @@ minecraft {
 
     // gradle complains if this isn't set when setting up/using IDEA workspace
     runDir = "run"
-    // set a full version string with appended build number to be used in mod registration
-    def buildnum = (config.build_number!="") ? '.' + config.build_number : ""
     
-    replace '@MOD_VERSION@', config.mod_version + buildnum
+    replace '@MOD_VERSION@', config.mod_version
     replace '1.0.0.0', config.forge_version
     replaceIn 'SereneSeasons.java'
 }
